@@ -42,7 +42,7 @@ http.createServer((req, res) => {
     const emoji = parsedUrl.query.emoji;
     
     if (!emoji) {
-      return res.end('Usa /api/v1/emojis?emoji=X para obtener su evolución');
+      return res.end('Usa /api/v1/emojis?emoji=💧 para obtener su evolución');
     }
     
     // Buscar el siguiente emoji
