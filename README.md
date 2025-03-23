@@ -10,7 +10,6 @@
 
 ![Node.js Badge](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white&style=flat)
 ![Express Badge](https://img.shields.io/badge/Express-000?logo=express&logoColor=white&style=flat)
-![Build Status](https://img.shields.io/github/actions/workflow/status/mgrl39/emoji-api/ci.yml)
 ![GitHub stars](https://img.shields.io/github/stars/mgrl39/emoji-api)
 ![GitHub issues](https://img.shields.io/github/issues/mgrl39/emoji-api)
 ![GitHub license](https://img.shields.io/github/license/mgrl39/emoji-api)
