@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
     const emoji = parsedUrl.query.emoji;
     
     if (!emoji) {
-      return res.end('Emoji es requerido. Usa /api/v1/emojis?emoji=💧');
+      return res.end('⚠️ Error: Debes proporcionar un emoji en la consulta. Ejemplo: /api/v1/emojis?emoji=💧');
     }
 
     // Buscar el siguiente emoji en la secuencia
@@ -43,9 +43,9 @@ const server = http.createServer((req, res) => {
       }
     }
 
-    return res.end(nextEmoji || `No hay evolución para ${emoji}`);
+    return res.end(nextEmoji || `🔍 No hay evolución para el emoji ${emoji}`);
   } else {
-    return res.end('Ruta no encontrada.');
+    return res.end('❌ Ruta no encontrada. Intenta con el endpoint correcto: /api/v1/emojis?emoji=💧');
   }
 });
 
