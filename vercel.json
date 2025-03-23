@@ -1,9 +1,16 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "src/api.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/api/v1/emojis",
-      "dest": "api.js"
+      "dest": "src/api.js"
     }
   ]
 }
+
