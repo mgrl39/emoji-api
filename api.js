@@ -55,6 +55,10 @@ app.listen(PORT, () => {
     console.log(`✅ API corriendo en http://localhost:${PORT}`);
 });
 
+app.get('/', (req, res) => {
+    res.send('✅ API funcionando correctamente en Vercel');
+});
+
 // Exportamos la aplicación para que pueda ser usada en tests o en un entorno de producción
 module.exports = app;
 
