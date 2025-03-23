@@ -1,5 +1,6 @@
 // Importamos el framework Express
 const express = require('express');
+const serverless = require('serverless-http'); // Añade esto
 // Creamos una instancia de la aplicación Express
 const app = express();
 
@@ -60,5 +61,5 @@ app.get('/', (req, res) => {
 });
 
 // Exportamos la aplicación para que pueda ser usada en tests o en un entorno de producción
-module.exports = app;
+module.exports = serverless(app);
 
