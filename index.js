@@ -1,65 +1,63 @@
-// Importamos el framework Express
-const express = require('express');
-const serverless = require('serverless-http'); // Añade esto
-// Creamos una instancia de la aplicación Express
-const app = express();
+const http = require('http');
+const url = require('url');
 
-// Definimos las líneas evolutivas de los emojis
+// Secuencias de emojis
 const emojiSequences = {
-    agua: ["💧", "🥛", "🚰", "🚚", "🏭", "🚂", "🚢", "🌎", "🚀", "🪐", "🌌", "🧬", "🤖", "🧠"],
-    fuego: ["🔥", "🍳", "🥓", "🍔", "🍕", "🌭", "🍖", "🍲", "🍱", "🥘", "🍽️", "🎉", "🍻", "🎆"]
+  agua: ["💧", "🥛", "🚰", "🚚", "🏭", "🚂", "🚢", "🌎", "🚀", "🪐", "🌌", "🧬", "🤖", "🧠"],
+  fuego: ["🔥", "🍳", "🥓", "🍔", "🍕", "🌭", "🍖", "🍲", "🍱", "🥘", "🍽️", "🎉", "🍻", "🎆"]
 };
 
-// Función para obtener el próximo emoji en la línea evolutiva
-const getNextEmoji = (req, res) => {
-	// Extraemos el parametro "emoji" de la URL (query string)
-    const emoji = req.query.emoji;
+// Función para encontrar el siguiente emoji
+function findNextEmoji(emoji) {
+  for (const sequence in emojiSequences) {
+    const emojis = emojiSequences[sequence];
+    const index = emojis.indexOf(emoji);
+    
+    if (index !== -1 && index < emojis.length - 1) {
+      return emojis[index + 1];
+    }
+  }
+  return null;
+}
 
-	// Si no se proporciona un emoji, devolvemos un error 400 (Bad Request)
-    if (!emoji) return res.status(400).send('Emoji es requerido'); // 🔥 Devuelve texto plano directamente
-
-	// Llamamos a la función que busca el siguiente emoji en la secuencia
+// Crear el servidor
+const server = http.createServer((req, res) => {
+  // Analizar la URL
+  const parsedUrl = url.parse(req.url, true);
+  
+  // Verificar si es la ruta de la API de emojis
+  if (parsedUrl.pathname === '/api/v1/emojis') {
+    const emoji = parsedUrl.query.emoji;
+    
+    if (!emoji) {
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      return res.end('Emoji es requerido');
+    }
+    
     const nextEmoji = findNextEmoji(emoji);
-
-	// Si encontramos el siguiente emoji, devolvemos un 200 (OK) con el emoji en texto plano
-    if (nextEmoji) return res.status(200).type('text/plain').send(nextEmoji);
-	// Si no hay un emoji siguiente, devolvemos un error 404 (Not Found) en texto plano
-    else return res.status(404).type('text/plain').send(`No hay evolución para el emoji: ${emoji}`);
+    
+    if (nextEmoji) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      return res.end(nextEmoji);
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      return res.end(`No hay evolución para el emoji: ${emoji}`);
     }
-};
+  } else {
+    // Ruta principal
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('API de Emojis funcionando! Usa /api/v1/emojis?emoji=💧 para obtener una evolución');
+  }
+});
 
-// Función para buscar el siguiente emoji en la secuencia
-const findNextEmoji = (emoji) => {
-	// Recorremos los valores de "emojiSequences" (agua y fuego)
-    for (const sequence of Object.values(emojiSequences)) {
-		// Buscamos el índice del emoji dentro de la secuencia
-        const index = sequence.indexOf(emoji);
-		// Si encontramos el emoji y no es el último de la lista
-        if (index !== -1 && index < sequence.length - 1) {
-			// Retornamos el siguiente emoji en la secuencia
-            return sequence[index + 1];
-        }
-    }
-	// Si no se encuentra el emoji o no hay uno siguiente, devolvemos "null"
-    return null;
-};
-
-// Endpoint HTTP GET para consultar el siguiente emoji
-app.get('/api/v1/emojis', getNextEmoji);
-
-// Definimos el puerto en el que va a correr el servidor
-// Si existe una variable de entorno PORT; la usa; de lo contrario, usa el puerto 3000
+// Puerto predeterminado para Vercel o 3000 para desarrollo local
 const PORT = process.env.PORT || 3000;
 
-// Iniciamos el servidor y lo ponemos a escuchar en el puerto definido
-app.listen(PORT, () => {
-    console.log(`✅ API corriendo en http://localhost:${PORT}`);
+// Iniciar el servidor
+server.listen(PORT, () => {
+  console.log(`Servidor iniciado en el puerto ${PORT}`);
 });
 
-app.get('/', (req, res) => {
-    res.send('✅ API funcionando correctamente en Vercel');
-});
-
-// Exportamos la aplicación para que pueda ser usada en tests o en un entorno de producción
-module.exports = serverless(app);
+// Para compatibilidad con Vercel
+module.exports = server;
 
