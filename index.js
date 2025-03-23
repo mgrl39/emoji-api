@@ -7,57 +7,59 @@ const emojiSequences = {
   fuego: ["🔥", "🍳", "🥓", "🍔", "🍕", "🌭", "🍖", "🍲", "🍱", "🥘", "🍽️", "🎉", "🍻", "🎆"]
 };
 
-// Función para encontrar el siguiente emoji
-function findNextEmoji(emoji) {
-  for (const sequence in emojiSequences) {
-    const emojis = emojiSequences[sequence];
-    const index = emojis.indexOf(emoji);
-    
-    if (index !== -1 && index < emojis.length - 1) {
-      return emojis[index + 1];
-    }
-  }
-  return null;
-}
-
-// Crear el servidor
-const server = http.createServer((req, res) => {
-  // Analizar la URL
+// Creamos un servidor simple
+http.createServer((req, res) => {
+  // Parsear la URL para obtener la ruta y los parámetros
   const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
   
-  // Verificar si es la ruta de la API de emojis
-  if (parsedUrl.pathname === '/api/v1/emojis') {
+  // Configurar la respuesta como texto plano UTF-8
+  res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
+  
+  // Verificar si es el endpoint específico /api/v1/emojis
+  if (path === '/api/v1/emojis') {
     const emoji = parsedUrl.query.emoji;
     
     if (!emoji) {
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      return res.end('Emoji es requerido');
+      return res.end('Emoji es requerido. Usa /api/v1/emojis?emoji=💧');
     }
     
-    const nextEmoji = findNextEmoji(emoji);
-    
-    if (nextEmoji) {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      return res.end(nextEmoji);
-    } else {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      return res.end(`No hay evolución para el emoji: ${emoji}`);
+    // Buscar el siguiente emoji
+    let nextEmoji = null;
+    for (const type in emojiSequences) {
+      const sequence = emojiSequences[type];
+      const index = sequence.indexOf(emoji);
+      if (index !== -1 && index < sequence.length - 1) {
+        nextEmoji = sequence[index + 1];
+        break;
+      }
     }
-  } else {
-    // Ruta principal
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('API de Emojis funcionando! Usa /api/v1/emojis?emoji=💧 para obtener una evolución');
+    
+    return res.end(nextEmoji || `No hay evolución para ${emoji}`);
+  } 
+  // Para cualquier otra ruta, mantener el comportamiento anterior
+  else {
+    const emoji = parsedUrl.query.emoji;
+    
+    if (!emoji) {
+      return res.end('Usa /api/v1/emojis?emoji=X para obtener su evolución');
+    }
+    
+    // Buscar el siguiente emoji
+    let nextEmoji = null;
+    for (const type in emojiSequences) {
+      const sequence = emojiSequences[type];
+      const index = sequence.indexOf(emoji);
+      if (index !== -1 && index < sequence.length - 1) {
+        nextEmoji = sequence[index + 1];
+        break;
+      }
+    }
+    
+    return res.end(nextEmoji || `No hay evolución para ${emoji}`);
   }
-});
+  
+}).listen(process.env.PORT || 3000);
 
-// Puerto predeterminado para Vercel o 3000 para desarrollo local
-const PORT = process.env.PORT || 3000;
-
-// Iniciar el servidor
-server.listen(PORT, () => {
-  console.log(`Servidor iniciado en el puerto ${PORT}`);
-});
-
-// Para compatibilidad con Vercel
-module.exports = server;
+console.log('Servidor ejecutándose');
 
