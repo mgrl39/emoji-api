@@ -13,8 +13,9 @@ const server = http.createServer((req, res) => {
 
   // 🔥 Configurar CORS
   res.setHeader('Access-Control-Allow-Origin', '*'); // Permitir cualquier origen
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Max-Age', 86400); // 24 horas
 
   // Responder a preflight OPTIONS para CORS
   if (req.method === 'OPTIONS') {
@@ -27,7 +28,7 @@ const server = http.createServer((req, res) => {
 
   if (path === '/api/v1/emojis') {
     const emoji = parsedUrl.query.emoji;
-    
+
     if (!emoji) {
       return res.end('⚠️ Error: Debes proporcionar un emoji en la consulta. Ejemplo: /api/v1/emojis?emoji=💧');
     }
